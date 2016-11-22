@@ -143,6 +143,3 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 slice
-gradle
-gradlew
-gradlew.bat
