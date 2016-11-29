@@ -1,4 +1,4 @@
-module demo {
+module Demo {
     interface Printer {
         void printString(string s);
     };

@@ -25,7 +25,7 @@ task compileSlice(type: Exec) {
     def sliceDir = new File("${projectDir}/slice/main/java")
     sliceDir.mkdirs()
 
-    commandLine 'slice2java', '--output-dir', "${projectDir}/slice/main/java", "${projectDir}/src/main/java/demo/Printer.ice"
+    commandLine 'slice2java', '--output-dir', "${projectDir}/slice/main/java", "${projectDir}/src/main/java/server/Printer.ice"
 
     standardOutput = new ByteArrayOutputStream()
 
