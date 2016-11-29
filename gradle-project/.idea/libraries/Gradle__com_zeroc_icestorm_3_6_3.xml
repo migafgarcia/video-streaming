@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.zeroc:icestorm:3.6.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.zeroc/icestorm/3.6.3/9647da63d8f628a9ad5e994374f86e1ea16fcdb/icestorm-3.6.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.zeroc/icestorm/3.6.3/fa831958b4d8e5e038e8e1611bed0b5b57b1013/icestorm-3.6.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
