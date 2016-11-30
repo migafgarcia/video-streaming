@@ -1,0 +1,44 @@
+apply plugin: 'java'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'slice'
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url 'https://repo.zeroc.com/nexus/content/repositories/releases'
+    }
+}
+
+dependencies {
+    compile 'com.zeroc:ice:3.6.3'
+    compile 'com.zeroc:icestorm:3.6.3'
+}
+
+task compileSlice(type: Exec) {
+    def sliceDir = new File("${projectDir}/slice/main/java")
+    sliceDir.mkdirs()
+
+    commandLine 'slice2java', '--output-dir', "${projectDir}/slice/main/java", "${projectDir}/src/main/java/server/Printer.ice"
+
+    standardOutput = new ByteArrayOutputStream()
+
+    ext.output = {
+        println standardOutput.toString()
+    }
+
+}
+
+gradle.projectsEvaluated {
+    compileJava.dependsOn(compileSlice)
+}
+
+String getRuntimeClasspath() {
+    sourceSets.main.runtimeClasspath.collect { it.absolutePath }.join(':')
+}
