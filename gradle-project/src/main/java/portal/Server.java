@@ -1,4 +1,4 @@
-package server;
+package portal;
 
 /**
  *
@@ -13,9 +13,9 @@ public class Server {
         try {
             ic = Ice.Util.initialize(args);
             Ice.ObjectAdapter adapter =
-                    ic.createObjectAdapterWithEndpoints("SimplePrinterAdapter", "default -p 10000");
-            Ice.Object object = new PrinterI();
-            adapter.add(object, ic.stringToIdentity("SimplePrinter"));
+                    ic.createObjectAdapterWithEndpoints("StreamerInterface", "default -p 10000");
+            Ice.Object object = new StreamerInterfaceI();
+            adapter.add(object, ic.stringToIdentity("StreamerInterface"));
             adapter.activate();
             ic.waitForShutdown();
         } catch(Ice.LocalException e) {

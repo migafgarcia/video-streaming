@@ -3,7 +3,7 @@ apply plugin: 'java'
 sourceSets {
     main {
         java {
-            srcDir 'slice'
+            srcDir 'slice/main/java'
         }
     }
 }
@@ -25,7 +25,7 @@ task compileSlice(type: Exec) {
     def sliceDir = new File("${projectDir}/slice/main/java")
     sliceDir.mkdirs()
 
-    commandLine 'slice2java', '--output-dir', "${projectDir}/slice/main/java", "${projectDir}/src/main/java/server/Printer.ice"
+    commandLine 'slice2java', '--output-dir', "${projectDir}/slice/main/java", "${projectDir}/src/main/java/portal/Portal.ice"
 
     standardOutput = new ByteArrayOutputStream()
 
