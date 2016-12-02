@@ -28,4 +28,11 @@ module portal {
     interface ClientInterface {
         streamInfoList getStreams();
     };
+
+    interface Notification {
+        void addStream(ShortStreamInfo streamInfo);
+        void deleteStream(string id);
+    };
+
+
 };
