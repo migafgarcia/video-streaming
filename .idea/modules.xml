@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/video-streaming.iml" filepath="$PROJECT_DIR$/video-streaming.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/VideoStreaming.iml" filepath="$PROJECT_DIR$/.idea/modules/VideoStreaming.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/VideoStreaming_main.iml" filepath="$PROJECT_DIR$/.idea/modules/VideoStreaming_main.iml" group="VideoStreaming" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/VideoStreaming_test.iml" filepath="$PROJECT_DIR$/.idea/modules/VideoStreaming_test.iml" group="VideoStreaming" />
     </modules>
   </component>
 </project>

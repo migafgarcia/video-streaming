@@ -38,7 +38,7 @@ public class Server {
             // Activate the adapter
             adapter.activate();
 
-            Ice.ObjectPrx obj = ic.stringToProxy("IceStorm/TopicManager:tcp -p 9999");
+            Ice.ObjectPrx obj = ic.stringToProxy("StreamerInterface:default -p 10000");
 
             IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
 
@@ -52,16 +52,23 @@ public class Server {
 
             // Example
             String[] keywords = {"painting", "relaxing", "epic"};
-            notification.addStream(new ShortStreamInfo("asdasdasd", "Bob Ross", keywords));
+            int i = 0;
+            while(true) {
+                Thread.sleep(1000);
+                notification.addStream(new ShortStreamInfo("ASD" + i++, "Bob Ross", keywords));
+            }
+
 
 
             // Blocks calling thread until shutdown has been called
-            ic.waitForShutdown();
+            //ic.waitForShutdown();
 
         } catch (Ice.LocalException e) {
             e.printStackTrace();
         } catch (TopicExists topicExists) {
             topicExists.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         if (ic != null) {
