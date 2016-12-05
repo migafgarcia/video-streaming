@@ -2,6 +2,7 @@ module portal {
     sequence<string> stringArray;
 
     struct StreamInfo {
+        string id;
         string name;
         string proto;
         string ip;
@@ -20,17 +21,13 @@ module portal {
 
     sequence<ShortStreamInfo> streamInfoList;
 
-    interface StreamerInterface {
-        string addStream(StreamInfo streamInfo);
-        void closeStream(string id);
-    };
 
     interface ClientInterface {
         streamInfoList getStreams();
     };
 
-    interface Notification {
-        void addStream(ShortStreamInfo streamInfo);
+    interface StreamerInterface {
+        void addStream(StreamInfo streamInfo);
         void deleteStream(string id);
     };
 
