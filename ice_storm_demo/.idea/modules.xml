@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IceStormDemo.iml" filepath="$PROJECT_DIR$/.idea/modules/IceStormDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IceStormDemo_main.iml" filepath="$PROJECT_DIR$/.idea/modules/IceStormDemo_main.iml" group="IceStormDemo" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IceStormDemo_test.iml" filepath="$PROJECT_DIR$/.idea/modules/IceStormDemo_test.iml" group="IceStormDemo" />
+    </modules>
+  </component>
+</project>
