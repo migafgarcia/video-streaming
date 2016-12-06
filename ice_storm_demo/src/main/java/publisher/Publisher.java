@@ -7,7 +7,6 @@ import shared.Measurement;
 import shared.MonitorPrx;
 import shared.MonitorPrxHelper;
 
-import static Ice.Application.communicator;
 
 /**
  *
@@ -23,8 +22,13 @@ public class Publisher {
      * @param args
      */
     public static void main(String[] args) {
+
+        Ice.Communicator communicator = Ice.Util.initialize(args);
+
+
+
         // 1 - Obtain a proxy for the TopicManager. This is the primary IceStorm object, used by both publishers and subscribers.
-        Ice.ObjectPrx obj = communicator().stringToProxy("IceStorm/TopicManager:tcp -p 9999");
+        Ice.ObjectPrx obj = communicator.stringToProxy("Notification/TopicManager:tcp -p 9999");
         IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
 
         // 2 - Obtain a proxy for the Weather topic, either by creating the topic if it does not exist, or retrieving the proxy for the existing topic.

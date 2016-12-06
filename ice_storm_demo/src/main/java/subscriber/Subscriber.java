@@ -5,7 +5,6 @@ import IceStorm.BadQoS;
 import IceStorm.InvalidSubscriber;
 import shared.Monitor;
 
-import static Ice.Application.communicator;
 
 public class Subscriber {
     /**
@@ -20,11 +19,11 @@ public class Subscriber {
      * @param args
      */
     public static void main(String[] args) {
-
-        Ice.ObjectPrx obj = communicator().stringToProxy("IceStorm/TopicManager:tcp -p 9999");
+        Ice.Communicator communicator = Ice.Util.initialize(args);
+        Ice.ObjectPrx obj = communicator.stringToProxy("Notification/TopicManager:tcp -p 9999");
         IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
 
-        Ice.ObjectAdapter adapter = communicator().createObjectAdapter("MonitorAdapter");
+        Ice.ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("MonitorAdapter", "tcp -p 10000");
 
         Monitor monitor = new MonitorI();
         Ice.ObjectPrx proxy = adapter.addWithUUID(monitor).ice_oneway();
@@ -46,7 +45,7 @@ public class Subscriber {
             badQoS.printStackTrace();
         }
 
-        communicator().waitForShutdown();
+        communicator.waitForShutdown();
 
         topic.unsubscribe(proxy);
 
