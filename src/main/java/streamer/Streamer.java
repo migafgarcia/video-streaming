@@ -1,10 +1,14 @@
 package streamer;
 
-import IceStorm.NoSuchTopic;
-import IceStorm.TopicExists;
-import portal.StreamInfo;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+
 import portal.StreamerInterfacePrx;
 import portal.StreamerInterfacePrxHelper;
+import utils.Md5;
 
 /**
  *
@@ -13,12 +17,25 @@ public class Streamer {
 
     public static void main(String[] args) {
 
+        // Read arguments
+
+        if(args.length < 4) {
+            System.out.println("Wrong number of arguments:\n\t $ java streamer.Streamer [NAME] [VIDEO] [WIDTH] [HEIGHT] [KEYWORD]...");
+            System.exit(0);
+        }
+
+        String name = args[0];
+        String video = args[1];
+        int width = Integer.parseInt(args[2]);
+        int height = Integer.parseInt(args[3]);
+        String[] keywords = Arrays.copyOfRange(args, 4, args.length);
+        String key = Md5.md5(new ByteArrayInputStream(new String(name + width + height + Arrays.toString(keywords) + System.currentTimeMillis()).getBytes()));
         int status = 0;
-        Ice.Communicator ic = null;
 
-        ic = Ice.Util.initialize(args);
+        try {
 
-            /*
+            Ice.Communicator ic = Ice.Util.initialize(args);
+
             Ice.ObjectPrx base = ic.stringToProxy("StreamerInterface:default -p 10000");
 
             StreamerInterfacePrx streamerInterface = StreamerInterfacePrxHelper.checkedCast(base);
@@ -26,55 +43,51 @@ public class Streamer {
             if (streamerInterface == null)
                 throw new Error("Invalid proxy");
 
-            String[] keywords = {"games", "stuff", "cats"};
+            String id = streamerInterface.addStream(key, name, "TCP", Inet4Address.getLocalHost().getHostName(), 6666, width, height, 400, keywords);
 
-            String id = streamerInterface.addStream(new StreamInfo("Some dude plays some game", "TCP", "127.0.0.1", 6666, 1920, 1080, 400, keywords));
-
-            if(!id.equals("")) {
-                new ProcessBuilder().start();
-            }
-            */
-
-
-        Ice.ObjectPrx obj = ic.stringToProxy("StreamerInterface:default -p 10000");
-
-        IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
-
-        IceStorm.TopicPrx topic = null;
-
-        try {
-            topic = topicManager.retrieve("Stream");
-        } catch (NoSuchTopic noSuchTopic) {
-            try {
-                topic = topicManager.create("Stream");
-            } catch (TopicExists topicExists) {
-                topicExists.printStackTrace();
+            for(int i = 0; i < 5 && id.equals(""); i++) {
+                System.out.println("Stream refused. ");
+                Thread.sleep(3000);
+                System.out.println("Retrying...");
+                id = streamerInterface.addStream(key, name, "TCP", Inet4Address.getLocalHost().getHostName(), 6666, width, height, 400, keywords);
             }
 
+            System.out.println("ID = " + id);
+
+            ProcessBuilder pb = new ProcessBuilder("ffmpeg", "-i", video, "-analyzeduration 500k", "-probesize 500k", "-r 30", "-c:v libx264", "-f mpegts", "-pix_fmt yuv420p", "tcp://127.0.0.1:8080?listen");
+
+            Process p = pb.start();
+
+
+
+
+            // ffmpeg -i video.mp4 -analyzeduration 500k -probesize 500k -r 30 -c:v libx264 -f mpegts -pix_fmt yuv420p tcp://127.0.0.1:8080?listen
+            p.waitFor();
+
+
+
+
+
+            streamerInterface.deleteStream(id, key);
+
+
+
+            // ic.waitForShutdown();
+
+        } catch (Ice.LocalException e) {
+            e.printStackTrace();
+            status = 1;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            status = 1;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            status = 1;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
 
-        Ice.ObjectPrx pub = topic.getPublisher().ice_oneway();
-
-        StreamerInterfacePrx streamerInterface = StreamerInterfacePrxHelper.uncheckedCast(pub);
-
-        // Example
-        String[] keywords = {"painting", "relaxing", "epic"};
-
-        streamerInterface.addStream(new StreamInfo("asd", "Some dude plays some game", "TCP", "127.0.0.1", 6666, 1920, 1080, 400, keywords));
-
-
-
-        if (ic != null) {
-            // Clean up
-            //
-            try {
-                ic.destroy();
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-                status = 1;
-            }
-        }
         System.exit(status);
 
     }

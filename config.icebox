@@ -1,0 +1,4 @@
+Ice.Admin.Endpoints=tcp -h localhost -p 9996
+Ice.Admin.InstanceName=icebox
+
+IceBox.Service.IceStorm=IceStormService,36:createIceStorm --Ice.Config=config.service

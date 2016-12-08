@@ -13,23 +13,24 @@ module portal {
         stringArray keywords;
     };
 
-    struct ShortStreamInfo {
-        string id;
-        string name;
-        stringArray keywords;
+    struct Stream {
+        string key;
+        StreamInfo streamInfo;
     };
 
-    sequence<ShortStreamInfo> streamInfoList;
-
+    sequence<StreamInfo> streamInfoList;
 
     interface ClientInterface {
         streamInfoList getStreams();
     };
 
     interface StreamerInterface {
-        void addStream(StreamInfo streamInfo);
-        void deleteStream(string id);
+        string addStream(string key, string name, string proto, string ip, int port, int width, int height, int bitrate, stringArray keywords);
+        void deleteStream(string id, string key);
     };
 
-
+    interface Notification {
+        void streamAdded(StreamInfo streamInfo);
+        void streamDeleted(string id);
+    };
 };

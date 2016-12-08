@@ -1,8 +1,8 @@
 package client;
 
-import IceStorm.AlreadySubscribed;
-import IceStorm.BadQoS;
-import IceStorm.InvalidSubscriber;
+import portal.ClientInterfacePrx;
+import portal.ClientInterfacePrxHelper;
+import portal.StreamInfo;
 
 public class Client {
     public static void main(String[] args) {
@@ -17,35 +17,25 @@ public class Client {
 
         int status = 0;
         Ice.Communicator ic = null;
-        try {
-            ic = Ice.Util.initialize(args);
 
-            Ice.ObjectPrx obj = ic.stringToProxy("Portal:default -p 10000");
-
-            IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
-
-            Ice.ObjectAdapter adapter = ic.createObjectAdapter("NotificationAdapter");
+        ic = Ice.Util.initialize(args);
 
 
-            adapter.activate();
+        Ice.ObjectPrx base = ic.stringToProxy("ClientInterface:default -p 10000");
 
-            IceStorm.TopicPrx topic = null;
-
-            try {
-                topic = topicManager.retrieve("Stream");
-                java.util.Map qos = null;
-            }
-            catch (IceStorm.NoSuchTopic ex) {
-                // Error! No topic found!
-            }
-
-            ic.waitForShutdown();
+        ClientInterfacePrx clientInterface = ClientInterfacePrxHelper.checkedCast(base);
 
 
-        } catch (Ice.LocalException e) {
-            e.printStackTrace();
-            status = 1;
+        if (clientInterface == null)
+            throw new Error("Invalid proxy");
+
+        StreamInfo[] streamInfos = clientInterface.getStreams();
+
+        for(StreamInfo streamInfo : streamInfos) {
+            System.out.println(streamInfo.id);
         }
+
+
         if (ic != null) {
             // Clean up
             //
@@ -57,6 +47,7 @@ public class Client {
             }
         }
         System.exit(status);
+
 
     }
 }

@@ -21,6 +21,10 @@ dependencies {
     compile 'com.zeroc:icestorm:3.6.3'
 }
 
+task runIcestorm(type: Exec) {
+    commandLine "icebox", "--Ice.Config=config.icebox"
+}
+
 task compileSlice(type: Exec) {
     def sliceDir = new File("${projectDir}/slice/main/java")
     sliceDir.mkdirs()
