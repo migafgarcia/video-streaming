@@ -46,13 +46,11 @@ public class Portal {
             Ice.ObjectPrx pub = topic.getPublisher().ice_oneway();
             NotificationPrx notificationPrx = NotificationPrxHelper.uncheckedCast(pub);
 
-            // Creation of servant
-            StreamerInterfaceI streamerInterface = new StreamerInterfaceI(notificationPrx);
-            ClientInterfaceI clientInterface = new ClientInterfaceI(streamerInterface);
+            Manager manager = new Manager(notificationPrx);
 
             // Inform the adapter about the new servant
-            adapter.add(streamerInterface, ic.stringToIdentity("StreamerInterface"));
-            adapter.add(clientInterface, ic.stringToIdentity("ClientInterface"));
+            adapter.add(manager.getStreamerInterface(), ic.stringToIdentity("StreamerInterface"));
+            adapter.add(manager.getClientInterface(), ic.stringToIdentity("ClientInterface"));
 
             // Activate the adapter
             adapter.activate();

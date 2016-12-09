@@ -54,25 +54,13 @@ public class Streamer {
 
             System.out.println("ID = " + id);
 
-            ProcessBuilder pb = new ProcessBuilder("ffmpeg", "-i", video, "-analyzeduration 500k", "-probesize 500k", "-r 30", "-c:v libx264", "-f mpegts", "-pix_fmt yuv420p", "tcp://127.0.0.1:8080?listen");
-
-            Process p = pb.start();
-
-
-
-
+            // ProcessBuilder pb = new ProcessBuilder("ffmpeg", "-i", video, "-analyzeduration 500k", "-probesize 500k", "-r 30", "-c:v libx264", "-f mpegts", "-pix_fmt yuv420p", "tcp://127.0.0.1:8080?listen");
+            // Process p = pb.start();
             // ffmpeg -i video.mp4 -analyzeduration 500k -probesize 500k -r 30 -c:v libx264 -f mpegts -pix_fmt yuv420p tcp://127.0.0.1:8080?listen
-            p.waitFor();
+            // p.waitFor();
 
+            //streamerInterface.deleteStream(id, key);
 
-
-
-
-            streamerInterface.deleteStream(id, key);
-
-
-
-            // ic.waitForShutdown();
 
         } catch (Ice.LocalException e) {
             e.printStackTrace();
@@ -83,8 +71,6 @@ public class Streamer {
         } catch (InterruptedException e) {
             e.printStackTrace();
             status = 1;
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
 

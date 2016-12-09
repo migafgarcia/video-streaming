@@ -1,7 +1,11 @@
 package client;
 
+import IceStorm.AlreadySubscribed;
+import IceStorm.BadQoS;
+import IceStorm.InvalidSubscriber;
 import portal.ClientInterfacePrx;
 import portal.ClientInterfacePrxHelper;
+import portal.Notification;
 import portal.StreamInfo;
 
 public class Client {
@@ -36,6 +40,35 @@ public class Client {
         }
 
 
+        Ice.ObjectPrx obj = ic.stringToProxy("Notification/TopicManager:tcp -p 9999");
+        IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
+
+        Ice.ObjectAdapter adapter = ic.createObjectAdapterWithEndpoints("NotificationAdapter", "tcp -p 10010");
+
+        Notification notification = new NotificationI();
+        Ice.ObjectPrx proxy = adapter.addWithUUID(notification).ice_oneway();
+        adapter.activate();
+
+        IceStorm.TopicPrx topic = null;
+        try {
+            topic = topicManager.retrieve("Stream");
+            java.util.Map qos = null;
+            topic.subscribeAndGetPublisher(qos, proxy);
+        }
+        catch (IceStorm.NoSuchTopic ex) {
+            ex.printStackTrace();
+        } catch (AlreadySubscribed alreadySubscribed) {
+            alreadySubscribed.printStackTrace();
+        } catch (InvalidSubscriber invalidSubscriber) {
+            invalidSubscriber.printStackTrace();
+        } catch (BadQoS badQoS) {
+            badQoS.printStackTrace();
+        }
+
+        ic.waitForShutdown();
+
+        topic.unsubscribe(proxy);
+
         if (ic != null) {
             // Clean up
             //
@@ -47,7 +80,5 @@ public class Client {
             }
         }
         System.exit(status);
-
-
     }
 }
