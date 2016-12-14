@@ -54,7 +54,7 @@ public class Manager {
     }
 
     /**
-     *
+     * Interface for streamers
      */
     private class StreamerInterfaceI extends _StreamerInterfaceDisp {
 
@@ -125,7 +125,7 @@ public class Manager {
     }
 
     /**
-     *
+     * Interface for clients
      */
     class ClientInterfaceI extends _ClientInterfaceDisp {
 
