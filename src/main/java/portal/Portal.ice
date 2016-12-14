@@ -1,5 +1,5 @@
 module portal {
-    sequence<string> stringArray;
+    sequence<string> StringArray;
 
     struct StreamInfo {
         string id;
@@ -10,7 +10,7 @@ module portal {
         int width;
         int height;
         int bitrate;
-        stringArray keywords;
+        StringArray keywords;
     };
 
     struct Stream {
@@ -25,7 +25,7 @@ module portal {
     };
 
     interface StreamerInterface {
-        string addStream(string key, string name, string proto, string ip, int port, int width, int height, int bitrate, stringArray keywords);
+        string addStream(string key, string name, string proto, string ip, int port, int width, int height, int bitrate, StringArray keywords);
         void deleteStream(string id, string key);
     };
 
