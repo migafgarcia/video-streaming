@@ -22,6 +22,8 @@ dependencies {
 }
 
 task runIcestorm(type: Exec) {
+    def db = new File("${projectDir}/db")
+    db.mkdirs()
     commandLine "icebox", "--Ice.Config=config.icebox"
 }
 
