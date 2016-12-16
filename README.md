@@ -9,3 +9,6 @@
 
  - Streamer private key (it would help if messages were encrypted)
  -
+
+## Notes
+ - Videos are being sent at a higher rate than necessary, which means multiple clients are not synced
