@@ -100,7 +100,8 @@ public class Streamer {
             System.out.println("ID = " + id);
 
             // Start ffmpeg
-            // TODO(migafgarcia): mess with ffmpeg options
+            // TODO(migafgarcia): start ffmpeg from code?
+            // TODO(migafgarcia): configure ffmpeg to not send as fast as possible
             //Process proc = new ProcessBuilder("ffmpeg", "-i", video,  "-f", "mpegts", "tcp://127.0.0.1:8080?listen=1").start();
 
             //ffmpeg -i video.mp4 -analyzeduration 500k -probesize 500k -r 30 -c:v libx264 -f mpegts -pix_fmt yuv420p tcp://127.0.0.1:8080?listen
@@ -128,7 +129,7 @@ public class Streamer {
             videoSource.connect(new InetSocketAddress("127.0.0.1", 8080));
 
             // Allocate buffer to store messages
-            ByteBuffer buffer = ByteBuffer.allocate(65483);
+            ByteBuffer buffer = ByteBuffer.allocate(1400);
 
             // Open a server socket channel for incoming requests
             ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
@@ -136,13 +137,13 @@ public class Streamer {
             serverSocketChannel.configureBlocking(false);
 
             Selector selector = Selector.open();
-            int ops = serverSocketChannel.validOps();
-            serverSocketChannel.register(selector, ops, null);
+            serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT, null);
+
             while(videoSource.read(buffer) != -1) {
 
-                selector.select();
+                // Non-blocking version of select
+                selector.selectNow();
 
-                // token representing the registration of a SelectableChannel with a Selector
                 Set<SelectionKey> keys = selector.selectedKeys();
                 Iterator<SelectionKey> keyIterator = keys.iterator();
 
@@ -154,18 +155,15 @@ public class Streamer {
                         SocketChannel channel = serverSocketChannel.accept();
                         channel.configureBlocking(false);
                         channel.register(selector, SelectionKey.OP_WRITE);
-                        System.out.println("New key registered");
+
                     }
                     else if(current.isWritable()) {
                         SocketChannel channel = (SocketChannel) current.channel();
-                        if(!channel.isConnected()) {
-                            System.out.println("ayy lmao");
-                        }
                         // TODO(migafgarcia): clients closing causes exception
                         try {
                             channel.write(buffer);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            current.cancel();
                         }
                     }
 
