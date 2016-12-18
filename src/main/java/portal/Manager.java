@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import Ice.Current;
-import utils.Md5;
+import helper.Md5;
 
 /**
  * Manages Streamers and Clients

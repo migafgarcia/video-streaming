@@ -18,7 +18,7 @@ import java.util.Set;
 
 import portal.StreamerInterfacePrx;
 import portal.StreamerInterfacePrxHelper;
-import utils.Md5;
+import helper.Md5;
 
 /**
  *  Streamer client
@@ -155,7 +155,6 @@ public class Streamer {
                         SocketChannel channel = serverSocketChannel.accept();
                         channel.configureBlocking(false);
                         channel.register(selector, SelectionKey.OP_WRITE);
-
                     }
                     else if(current.isWritable()) {
                         SocketChannel channel = (SocketChannel) current.channel();
@@ -164,6 +163,7 @@ public class Streamer {
                             channel.write(buffer);
                         } catch (IOException e) {
                             current.cancel();
+                            e.printStackTrace();
                         }
                     }
 
@@ -173,7 +173,6 @@ public class Streamer {
             }
 
             streamerInterface.deleteStream(id, key);
-
 
         } catch (Ice.LocalException e) {
             e.printStackTrace();
