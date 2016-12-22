@@ -2,13 +2,7 @@
 
 ## TODO list
 
- - Heartbeat
+ - Heartbeat (?)
  - Test multiple streams at the same time
-
-## Features
-
- - Streamer private key (it would help if messages were encrypted)
- -
-
-## Notes
- - Videos are being sent at a higher rate than necessary, which means multiple clients are not synced
+ - Configure ffmpeg correctly so many streams are synced
+ - Find a way to deploy with Makefile
