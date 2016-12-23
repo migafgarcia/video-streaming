@@ -1,11 +1,8 @@
 package client;
 
-import java.util.Scanner;
-
 import IceStorm.AlreadySubscribed;
 import IceStorm.BadQoS;
 import IceStorm.InvalidSubscriber;
-import IceStorm.NoSuchTopic;
 import portal.ClientInterfacePrx;
 import portal.ClientInterfacePrxHelper;
 import portal.Notification;
@@ -24,41 +21,53 @@ public class Client {
 
         int status = 0;
         Ice.Communicator ic = null;
-        try {
 
-            ic = Ice.Util.initialize(args);
-
-
-            Ice.ObjectPrx base = ic.stringToProxy("ClientInterface:default -p 10000");
-
-            ClientInterfacePrx clientInterface = ClientInterfacePrxHelper.checkedCast(base);
+        ic = Ice.Util.initialize(args);
 
 
-            if (clientInterface == null)
-                throw new Error("Invalid proxy");
+        Ice.ObjectPrx base = ic.stringToProxy("ClientInterface:default -p 10000");
 
-            StreamInfo[] streamInfos = clientInterface.getStreams();
-
-            for (StreamInfo streamInfo : streamInfos) {
-                System.out.println(streamInfo.id);
-            }
-
-            Notifier notifier = new Notifier(ic);
-            notifier.start();
-
-            Scanner scanner = new Scanner(System.in);
-
-            while(scanner.hasNextLine()) {
-                System.out.println(scanner.nextLine());
-            }
+        ClientInterfacePrx clientInterface = ClientInterfacePrxHelper.checkedCast(base);
 
 
-            ic.waitForShutdown();
-        } catch (Ice.LocalException e) {
-            e.printStackTrace();
-            status = 1;
+        if (clientInterface == null)
+            throw new Error("Invalid proxy");
+
+        StreamInfo[] streamInfos = clientInterface.getStreams();
+
+        for(StreamInfo streamInfo : streamInfos) {
+            System.out.println(streamInfo.id);
         }
 
+
+        Ice.ObjectPrx obj = ic.stringToProxy("Notification/TopicManager:tcp -p 9999");
+        IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
+
+        Ice.ObjectAdapter adapter = ic.createObjectAdapterWithEndpoints("NotificationAdapter", "tcp -p 10010");
+
+        Notification notification = new NotificationI();
+        Ice.ObjectPrx proxy = adapter.addWithUUID(notification).ice_oneway();
+        adapter.activate();
+
+        IceStorm.TopicPrx topic = null;
+        try {
+            topic = topicManager.retrieve("Stream");
+            java.util.Map qos = null;
+            topic.subscribeAndGetPublisher(qos, proxy);
+        }
+        catch (IceStorm.NoSuchTopic ex) {
+            ex.printStackTrace();
+        } catch (AlreadySubscribed alreadySubscribed) {
+            alreadySubscribed.printStackTrace();
+        } catch (InvalidSubscriber invalidSubscriber) {
+            invalidSubscriber.printStackTrace();
+        } catch (BadQoS badQoS) {
+            badQoS.printStackTrace();
+        }
+
+        ic.waitForShutdown();
+
+        topic.unsubscribe(proxy);
 
         if (ic != null) {
             // Clean up
