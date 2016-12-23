@@ -116,6 +116,7 @@ public class Manager {
             if (stream == null)
                 System.out.println("DELETE STREAM -> id: \"" + id + "\" failed: stream doesn't exist");
             else if (key.equals(stream.key)) {
+                streams.remove(id);
                 notificationPrx.streamDeleted(id);
                 System.out.println("DELETE STREAM -> id: \"" + id + "\" successfully");
             } else
