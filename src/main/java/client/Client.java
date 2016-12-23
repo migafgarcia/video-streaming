@@ -1,8 +1,16 @@
 package client;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import IceStorm.AlreadySubscribed;
 import IceStorm.BadQoS;
 import IceStorm.InvalidSubscriber;
+import IceStorm.NoSuchTopic;
 import portal.ClientInterfacePrx;
 import portal.ClientInterfacePrxHelper;
 import portal.Notification;
@@ -19,55 +27,85 @@ public class Client {
          *  Unsubscribe from the Stream topic.
          */
 
-        int status = 0;
         Ice.Communicator ic = null;
-
-        ic = Ice.Util.initialize(args);
-
-
-        Ice.ObjectPrx base = ic.stringToProxy("ClientInterface:default -p 10000");
-
-        ClientInterfacePrx clientInterface = ClientInterfacePrxHelper.checkedCast(base);
-
-
-        if (clientInterface == null)
-            throw new Error("Invalid proxy");
-
-        StreamInfo[] streamInfos = clientInterface.getStreams();
-
-        for(StreamInfo streamInfo : streamInfos) {
-            System.out.println(streamInfo.id);
-        }
-
-
-        Ice.ObjectPrx obj = ic.stringToProxy("Notification/TopicManager:tcp -p 9999");
-        IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
-
-        Ice.ObjectAdapter adapter = ic.createObjectAdapterWithEndpoints("NotificationAdapter", "tcp -p 10010");
-
-        Notification notification = new NotificationI();
-        Ice.ObjectPrx proxy = adapter.addWithUUID(notification).ice_oneway();
-        adapter.activate();
-
-        IceStorm.TopicPrx topic = null;
         try {
+
+            ic = Ice.Util.initialize(args);
+
+
+            Ice.ObjectPrx base = ic.stringToProxy("ClientInterface:default -p 10000");
+
+            ClientInterfacePrx clientInterface = ClientInterfacePrxHelper.checkedCast(base);
+
+
+            if (clientInterface == null)
+                throw new Error("Invalid proxy");
+
+            Ice.ObjectPrx obj = ic.stringToProxy("Notification/TopicManager:tcp -p 9999");
+            IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
+
+            Ice.ObjectAdapter adapter = ic.createObjectAdapterWithEndpoints("NotificationAdapter", "tcp -p 10010");
+
+            NotificationI notification = new NotificationI(clientInterface.getStreams());
+            Ice.ObjectPrx proxy = adapter.addWithUUID(notification).ice_oneway();
+            adapter.activate();
+
+            IceStorm.TopicPrx topic = null;
+
             topic = topicManager.retrieve("Stream");
             java.util.Map qos = null;
             topic.subscribeAndGetPublisher(qos, proxy);
-        }
-        catch (IceStorm.NoSuchTopic ex) {
-            ex.printStackTrace();
-        } catch (AlreadySubscribed alreadySubscribed) {
-            alreadySubscribed.printStackTrace();
+
+            Pattern listPattern = Pattern.compile("\\s*l\\s*");
+            Pattern connectPattern = Pattern.compile("\\s*c\\s*(\\w+)\\s*");
+
+            Scanner scanner = new Scanner(System.in);
+            String line;
+
+
+            while(scanner.hasNextLine()) {
+                line = scanner.nextLine();
+
+                if(listPattern.matcher(line).matches()) {
+                    System.out.println("LISTING");
+                    notification.printStreams();
+
+                }
+                else  {
+                    Matcher matcher = connectPattern.matcher(line);
+
+                    if(matcher.matches()) {
+                        System.out.println("CONNECTING TO " + matcher.group(1));
+                        StreamInfo stream = notification.getStreamInfo(matcher.group(1));
+                        if(stream == null)
+                            System.out.println("Stream doesn't exist");
+                        else {
+                            Process p = new ProcessBuilder("vlc", "tcp://" + stream.ip + ":" + stream.port).start();
+                            p.waitFor();
+                        }
+                    }
+                }
+
+            }
+
+            ic.waitForShutdown();
+
+            topic.unsubscribe(proxy);
+        } catch (Ice.LocalException e) {
+            e.printStackTrace();
         } catch (InvalidSubscriber invalidSubscriber) {
             invalidSubscriber.printStackTrace();
+        } catch (AlreadySubscribed alreadySubscribed) {
+            alreadySubscribed.printStackTrace();
+        } catch (NoSuchTopic noSuchTopic) {
+            noSuchTopic.printStackTrace();
         } catch (BadQoS badQoS) {
             badQoS.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-        ic.waitForShutdown();
-
-        topic.unsubscribe(proxy);
 
         if (ic != null) {
             // Clean up
@@ -76,9 +114,7 @@ public class Client {
                 ic.destroy();
             } catch (Exception e) {
                 System.err.println(e.getMessage());
-                status = 1;
             }
         }
-        System.exit(status);
     }
 }
