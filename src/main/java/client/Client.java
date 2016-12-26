@@ -44,7 +44,7 @@ public class Client {
             Ice.ObjectPrx obj = ic.stringToProxy("Notification/TopicManager:tcp -p 9999");
             IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
 
-            Ice.ObjectAdapter adapter = ic.createObjectAdapterWithEndpoints("NotificationAdapter", "tcp -p 10010");
+            Ice.ObjectAdapter adapter = ic.createObjectAdapterWithEndpoints("NotificationAdapter", "tcp");
 
             NotificationI notification = new NotificationI(clientInterface.getStreams());
             Ice.ObjectPrx proxy = adapter.addWithUUID(notification).ice_oneway();
