@@ -3,6 +3,7 @@ package streamer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -21,18 +22,19 @@ import portal.StreamerInterfacePrxHelper;
 import helper.Md5;
 
 /**
- *  Streamer client
+ * Streamer client
  */
 public class Streamer {
 
     public static final int PORT = 6666;
+    public static final int MAX_RETRY = 5;
 
     public static void main(String[] args) {
 
         // TODO(migafgarcia): add shutdown hook for closing stream in the portal OR heartbeat in portal (or both)
 
         // Read arguments
-        if(args.length < 5) {
+        if (args.length < 5) {
             System.out.println("Wrong number of arguments:\n\t $ java streamer.Streamer [PORTAL_URL] [NAME] [VIDEO] [WIDTH] [HEIGHT] [KEYWORD]...");
             System.exit(0);
         }
@@ -99,22 +101,92 @@ public class Streamer {
 
             System.out.println("ID = " + id);
 
-            // Start ffmpeg
-            // TODO(migafgarcia): start ffmpeg from code?
-            // TODO(migafgarcia): configure ffmpeg to not send as fast as possible
-            //Process proc = new ProcessBuilder("ffmpeg", "-i", video,  "-f", "mpegts", "tcp://127.0.0.1:8080?listen=1").start();
-
-            //ffmpeg -i video.mp4 -analyzeduration 500k -probesize 500k -r 30 -c:v libx264 -f mpegts -pix_fmt yuv420p tcp://127.0.0.1:8080?listen
             /*
-            Process proc = new ProcessBuilder("ffmpeg", "-i", video,
-                    "-analyzeduration", "500k",
-                    "-probesize", "500k",
-                    "-r", "30",
-                    "-c:v", "libx264",
-                    "-pix_fmt", "yuv420p",
-                    "-f", "mpegts",
-                    "tcp://127.0.0.1:8080?listen=1").start();
+             * FFMPEG OPTIONS
+             */
 
+            /*
+             * Read input at native frame rate. Mainly used to simulate a grab device, or live input stream (e.g. when reading from a file).
+             * Should not be used with actual grab devices or live input streams (where it can cause packet loss).
+             * By default ffmpeg attempts to read the input(s) as fast as possible.
+             * This option will slow down the reading of the input(s) to the native frame rate of the input(s).
+             * It is useful for real-time output (e.g. live streaming).
+             */
+            String READ_OPTION = "-re";
+
+            String INPUT_OPTION = "-i";
+            String INPUT = video;
+
+            /*
+             * Specify how many microseconds are analyzed to probe the input.
+             * A higher value will enable detecting more accurate information, but will increase latency.
+             * It defaults to 5,000,000 microseconds = 5 seconds.
+             */
+            String ANALYZE_DURATION_OPTION = "-analyzeduration";
+            String ANALYZE_DURATION = "500k";
+
+            /*
+             * Set probing size in bytes, i.e. the size of the data to analyze to get stream information.
+             * A higher value will enable detecting more information in case it is dispersed into the stream, but will increase latency.
+             * Must be an integer not lesser than 32. It is 5000000 by default.
+             */
+            String PROBE_SIZE_OPTION = "-probesize";
+            String PROBE_SIZE = "500k";
+
+            String RATE_OPTION = "-r";
+            String RATE = "30";
+
+            String VIDEO_CODEC_OPTION = "-c:v";
+            String VIDEO_CODEC = "libx264";
+
+            String AUDIO_CODEC_OPTION = "-c:a";
+            String AUDIO_CODEC = "libfdk_aac";
+
+            String VIDEO_BITRATE_OPTION = "-b:v";
+            String VIDEO_BITRATE = "";
+
+            String AUDIO_BITRATE_OPTION = "-b:a";
+            String AUDIO_BITRATE = "";
+
+
+
+            /*
+             * Set pixel format. Use -pix_fmts to show all the supported pixel formats.
+             * If the selected pixel format can not be selected, ffmpeg will print a warning and select the best pixel format supported by the encoder.
+             * If pix_fmt is prefixed by a +, ffmpeg will exit with an error if the requested pixel format can not be selected,
+             * and automatic conversions inside filtergraphs are disabled.
+             * If pix_fmt is a single +, ffmpeg selects the same pixel format as the input (or graph output) and automatic conversions are disabled.
+             */
+            String PIXEL_FORMAT_OPTION = "-pix_fmt";
+            String PIXEL_FORMAT = "yuv420p";
+
+            String FORMAT_OPTION = "-f";
+            String FORMAT = "mpegts";
+
+            String PRESET_OPTION = "-preset";
+            String PRESET = "medium";
+
+            String METADATA_OPTION = "-metadata";
+            String METADATA = "title=\"" + name + "\"";
+
+            String SCALE_OPTION = "-s";
+            String SCALE = width + "x" + height;
+
+            String OUTPUT = "tcp://127.0.0.1:8080?listen=1";
+
+
+
+            Process proc = new ProcessBuilder("ffmpeg",
+                    READ_OPTION,
+                    INPUT_OPTION, INPUT,
+                    VIDEO_CODEC_OPTION, VIDEO_CODEC,
+                    PIXEL_FORMAT_OPTION, PIXEL_FORMAT,
+                    PRESET_OPTION, PRESET,
+                    METADATA_OPTION, METADATA,
+                    FORMAT_OPTION, FORMAT,
+                    OUTPUT).start();
+
+            /*
             BufferedReader stderr = new BufferedReader(new
                     InputStreamReader(proc.getErrorStream()));
 
@@ -125,8 +197,28 @@ public class Streamer {
 
 
             //Establish a connection to ffmpeg
-            SocketChannel videoSource = SocketChannel.open();
-            videoSource.connect(new InetSocketAddress("127.0.0.1", 8080));
+            SocketChannel videoSource = null;
+
+            // Because ffmpeg takes a while to load, we retry MAX_RETRY times with 1 second intervals
+            for (int i = 0; i < MAX_RETRY; i++) {
+                try {
+                    videoSource = SocketChannel.open();
+                    videoSource.connect(new InetSocketAddress("127.0.0.1", 8080));
+                    break;
+                } catch (ConnectException e) {
+                    System.out.println("Connecting to ffmpeg, try " + i);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+
+            if (!videoSource.isConnected()) {
+                System.out.println("Could not connect to ffmpeg");
+                System.exit(1);
+            }
 
             // Allocate buffer to store messages
             ByteBuffer buffer = ByteBuffer.allocate(1400);
@@ -139,7 +231,7 @@ public class Streamer {
             Selector selector = Selector.open();
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT, null);
 
-            while(videoSource.read(buffer) != -1) {
+            while (videoSource.read(buffer) != -1) {
 
                 // Non-blocking version of select
                 selector.selectNow();
@@ -147,16 +239,15 @@ public class Streamer {
                 Set<SelectionKey> keys = selector.selectedKeys();
                 Iterator<SelectionKey> keyIterator = keys.iterator();
 
-                while(keyIterator.hasNext()) {
+                while (keyIterator.hasNext()) {
                     buffer.flip();
                     SelectionKey current = keyIterator.next();
 
-                    if(current.isAcceptable()) {
+                    if (current.isAcceptable()) {
                         SocketChannel channel = serverSocketChannel.accept();
                         channel.configureBlocking(false);
                         channel.register(selector, SelectionKey.OP_WRITE);
-                    }
-                    else if(current.isWritable()) {
+                    } else if (current.isWritable()) {
                         SocketChannel channel = (SocketChannel) current.channel();
                         // TODO(migafgarcia): clients closing causes exception
                         try {
