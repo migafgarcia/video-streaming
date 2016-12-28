@@ -32,5 +32,6 @@ module portal {
     interface Notification {
         void streamAdded(StreamInfo streamInfo);
         void streamDeleted(string id);
+        void deleteAll();
     };
 };

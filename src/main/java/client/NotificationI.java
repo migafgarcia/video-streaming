@@ -37,6 +37,11 @@ public class NotificationI extends _NotificationDisp {
         streams.remove(id);
     }
 
+    @Override
+    public void deleteAll(Current __current) {
+        streams.clear();
+    }
+
     public Map<String, StreamInfo> getStreams() {
         return streams;
     }

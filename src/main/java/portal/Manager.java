@@ -31,6 +31,8 @@ public class Manager {
 
         this.clientInterface = new ClientInterfaceI();
 
+        this.notificationPrx.deleteAll();
+
     }
 
     public StreamerInterfaceI getStreamerInterface() {
