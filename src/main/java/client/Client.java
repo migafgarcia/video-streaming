@@ -58,6 +58,7 @@ public class Client {
 
             Pattern listPattern = Pattern.compile("\\s*l\\s*");
             Pattern connectPattern = Pattern.compile("\\s*c\\s+(\\w+)\\s*");
+            Pattern searchPattern = Pattern.compile("\\s*s\\s+(\\w+)\\s*");
 
             Scanner scanner = new Scanner(System.in);
             String line;
@@ -66,25 +67,30 @@ public class Client {
             while(scanner.hasNextLine()) {
                 line = scanner.nextLine();
 
+                Matcher connectMatcher = connectPattern.matcher(line);
+                Matcher searchMatcher = searchPattern.matcher(line);
+
+
+
                 if(listPattern.matcher(line).matches()) {
                     System.out.println("LISTING");
                     notification.printStreams();
 
                 }
-                else  {
-                    Matcher matcher = connectPattern.matcher(line);
-
-                    if(matcher.matches()) {
-                        System.out.println("CONNECTING TO " + matcher.group(1));
-                        StreamInfo stream = notification.getStreamInfo(matcher.group(1));
-                        if(stream == null)
-                            System.out.println("Stream doesn't exist");
-                        else {
-                            Process p = new ProcessBuilder("vlc", "tcp://" + stream.ip + ":" + stream.port).start();
-                            p.waitFor();
-                        }
+                else if(connectMatcher.matches()) {
+                    System.out.println("CONNECTING TO " + connectMatcher.group(1));
+                    StreamInfo stream = notification.getStreamInfo(connectMatcher.group(1));
+                    if(stream == null)
+                        System.out.println("Stream doesn't exist");
+                    else {
+                        Process p = new ProcessBuilder("vlc", "tcp://" + stream.ip + ":" + stream.port).start();
+                        p.waitFor();
                     }
                 }
+                else if(searchMatcher.matches()) {
+
+                }
+
 
             }
 
