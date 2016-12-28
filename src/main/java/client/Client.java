@@ -57,7 +57,7 @@ public class Client {
             topic.subscribeAndGetPublisher(qos, proxy);
 
             Pattern listPattern = Pattern.compile("\\s*l\\s*");
-            Pattern connectPattern = Pattern.compile("\\s*c\\s*(\\w+)\\s*");
+            Pattern connectPattern = Pattern.compile("\\s*c\\s+(\\w+)\\s*");
 
             Scanner scanner = new Scanner(System.in);
             String line;
