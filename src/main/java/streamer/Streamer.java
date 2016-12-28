@@ -143,8 +143,6 @@ public class Streamer {
             String AUDIO_BITRATE_OPTION = "-b:a";
             String AUDIO_BITRATE = "";
 
-
-
             /*
              * Set pixel format. Use -pix_fmts to show all the supported pixel formats.
              * If the selected pixel format can not be selected, ffmpeg will print a warning and select the best pixel format supported by the encoder.
@@ -158,8 +156,14 @@ public class Streamer {
             String FORMAT_OPTION = "-f";
             String FORMAT = "mpegts";
 
+            String TUNE_OPTION = "-tune";
+            String TUNE = "zerolatency";
+
             String PRESET_OPTION = "-preset";
-            String PRESET = "medium";
+            String PRESET = "ultrafast";
+
+            String VIDEO_PROFILE_OPTION = "-profile:v";
+            String VIDEO_PROFILE = "high";
 
             String METADATA_OPTION = "-metadata";
             String METADATA = "title=\"" + name + "\"";
@@ -171,15 +175,24 @@ public class Streamer {
 
 
 
-            Process proc = new ProcessBuilder("ffmpeg",
+
+
+            ProcessBuilder pb = new ProcessBuilder("ffmpeg",
                     READ_OPTION,
                     INPUT_OPTION, INPUT,
                     VIDEO_CODEC_OPTION, VIDEO_CODEC,
                     PIXEL_FORMAT_OPTION, PIXEL_FORMAT,
+                    TUNE_OPTION, TUNE,
                     PRESET_OPTION, PRESET,
+                    VIDEO_PROFILE_OPTION, VIDEO_PROFILE,
                     METADATA_OPTION, METADATA,
+                    SCALE_OPTION, SCALE,
                     FORMAT_OPTION, FORMAT,
-                    OUTPUT).start();
+                    OUTPUT);
+
+
+            System.out.println(String.join(" ", pb.command()));
+            //Process proc = pb.start();
 
             /*
             BufferedReader stderr = new BufferedReader(new
