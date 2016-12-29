@@ -192,7 +192,7 @@ public class Streamer {
 
 
             System.out.println(String.join(" ", pb.command()));
-            //Process proc = pb.start();
+            Process proc = pb.start();
 
             /*
             BufferedReader stderr = new BufferedReader(new
@@ -265,7 +265,12 @@ public class Streamer {
                         SocketChannel channel = (SocketChannel) current.channel();
                         // TODO(migafgarcia): clients closing causes exception
                         try {
-                            channel.write(buffer);
+                            int toWrite = buffer.remaining();
+                            int bytesWritten = channel.write(buffer);
+
+                            if(toWrite != bytesWritten){
+                                System.out.println("TO WRITE: " + toWrite + ", WRITTEN: " + bytesWritten);
+                            }
                         } catch (IOException e) {
                             current.cancel();
                             e.printStackTrace();
