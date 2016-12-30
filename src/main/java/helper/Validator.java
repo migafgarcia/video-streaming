@@ -24,7 +24,7 @@ public class Validator {
     }
 
     public static boolean validateResolution(int width, int height) {
-        return width >= 800 && width <= 1920 && height >= 600 && height <= 1080;
+        return width >= 200 && width <= 1920 && height >= 200 && height <= 1080;
     }
 
 
