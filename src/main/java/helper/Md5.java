@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class Md5 {
 
+    public static final int KEY_SIZE = 32;
 
     public static final String md5(InputStream inputStream){
         MessageDigest md;

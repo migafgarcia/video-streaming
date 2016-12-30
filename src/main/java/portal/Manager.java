@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import Ice.Current;
 import helper.Md5;
+import helper.Validator;
 
 /**
  * Manages Streamers and Clients
@@ -55,6 +56,7 @@ public class Manager {
 
     }
 
+
     /**
      * Interface for streamers
      */
@@ -63,7 +65,25 @@ public class Manager {
         @Override
         public String addStream(String key, String name, String proto, String ip, int port, int width, int height, int bitrate, String[] keywords, Current __current) {
 
-            // TODO(migafgarcia): check size of key and other stuff
+            if(!Validator.validateKey(key)) {
+                System.out.println("ADD STREAM -> invalid key");
+                return null;
+            }
+
+            if(!Validator.validateProto(proto)) {
+                System.out.println("ADD STREAM -> invalid protocol");
+                return null;
+            }
+
+            if(!Validator.validateIp(ip)) {
+                System.out.println("ADD STREAM -> invalid IP");
+                return null;
+            }
+
+            if(!Validator.validateResolution(width, height)) {
+                System.out.println("ADD STREAM -> invalid resolution");
+                return null;
+            }
 
             // Print for logging
             System.out.println(
@@ -111,9 +131,13 @@ public class Manager {
         @Override
         public void deleteStream(String id, String key, Current __current) {
 
+            if(!Validator.validateKey(id) || !Validator.validateKey(key)) {
+                System.out.println("DELETE STREAM -> invalid key or id"); // this isn't lazy, just practical
+                return;
+            }
+
             Stream stream = streams.get(id);
 
-            // TODO(migafgarcia): check if id and key size are valid
 
             if (stream == null)
                 System.out.println("DELETE STREAM -> id: \"" + id + "\" failed: stream doesn't exist");

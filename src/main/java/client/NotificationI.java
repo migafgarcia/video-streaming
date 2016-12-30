@@ -27,13 +27,11 @@ public class NotificationI extends _NotificationDisp {
 
     @Override
     public void streamAdded(StreamInfo streamInfo, Current __current) {
-        // TODO(migafgarcia): check for stuff
         streams.put(streamInfo.id, streamInfo);
     }
 
     @Override
     public void streamDeleted(String id, Current __current) {
-        // TODO(migafgarcia): check for stuff
         streams.remove(id);
     }
 
