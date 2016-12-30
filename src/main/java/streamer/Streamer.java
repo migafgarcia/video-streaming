@@ -173,10 +173,6 @@ public class Streamer {
 
             String OUTPUT = "tcp://127.0.0.1:8080?listen=1";
 
-
-
-
-
             ProcessBuilder pb = new ProcessBuilder("ffmpeg",
                     READ_OPTION,
                     INPUT_OPTION, INPUT,
@@ -192,7 +188,7 @@ public class Streamer {
 
 
             System.out.println(String.join(" ", pb.command()));
-            //Process proc = pb.start();
+            Process proc = pb.start();
 
             /*
             BufferedReader stderr = new BufferedReader(new
@@ -240,8 +236,9 @@ public class Streamer {
             String id = streamerInterface.addStream(key, name, "TCP", Inet4Address.getLocalHost().getHostName(), serverSocketChannel.socket().getLocalPort(), width, height, 400, keywords);
 
             System.out.println("ID = " + id);
-
-
+            Runtime.getRuntime().addShutdownHook(new Thread(
+                    () -> streamerInterface.deleteStream(id, key)));
+            
             Selector selector = Selector.open();
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT, null);
 

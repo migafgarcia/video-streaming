@@ -56,6 +56,10 @@ public class Client {
             java.util.Map qos = null;
             topic.subscribeAndGetPublisher(qos, proxy);
 
+            final IceStorm.TopicPrx finalTopic = topic;
+            Runtime.getRuntime().addShutdownHook(new Thread(
+                    () -> finalTopic.unsubscribe(proxy)));
+
             Pattern listPattern = Pattern.compile("\\s*l\\s*");
             Pattern connectPattern = Pattern.compile("\\s*c\\s+(\\w+)\\s*");
             Pattern searchPattern = Pattern.compile("\\s*s\\s+(\\w+)\\s*");
