@@ -9,7 +9,6 @@ sourceSets {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven {
         url 'https://repo.zeroc.com/nexus/content/repositories/releases'
