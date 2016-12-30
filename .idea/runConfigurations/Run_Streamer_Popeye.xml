@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Streamer" type="Application" factoryName="Application">
+  <configuration default="false" name="Run Streamer Popeye" type="Application" factoryName="Application">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <option name="MAIN_CLASS_NAME" value="streamer.Streamer" />
     <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="127.0.0.1 &quot;Top Gear&quot; videos/video1.mp4 1920 1080 topgear bbc cars vehicles comedy cptslow" />
+    <option name="PROGRAM_PARAMETERS" value="127.0.0.1 &quot;Popeye&quot; videos/popeye.mp4 320 258 popeye alibaba lowres nothd" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" />
