@@ -7,9 +7,8 @@ module portal {
         string proto;
         string ip;
         int port;
-        int width;
-        int height;
-        int bitrate;
+        string res;
+        string bitrate;
         StringArray keywords;
     };
 
@@ -25,7 +24,7 @@ module portal {
     };
 
     interface StreamerInterface {
-        string addStream(string key, string name, string proto, string ip, int port, int width, int height, int bitrate, StringArray keywords);
+        string addStream(string key, string name, string proto, string ip, int port, string res, string bitrate, StringArray keywords);
         void deleteStream(string id, string key);
     };
 

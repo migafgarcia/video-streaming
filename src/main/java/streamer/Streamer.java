@@ -1,10 +1,13 @@
 package streamer;
 
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -14,6 +17,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -21,6 +25,7 @@ import helper.Validator;
 import portal.StreamerInterfacePrx;
 import portal.StreamerInterfacePrxHelper;
 import helper.Md5;
+import shared.Resolutions;
 
 /**
  * Streamer client
@@ -29,11 +34,12 @@ public class Streamer {
 
     public static final int MAX_RETRY = 5;
 
+
     public static void main(String[] args) {
 
         // Read arguments
         if (args.length < 5) {
-            System.out.println("Wrong number of arguments:\n\t $ java streamer.Streamer [PORTAL_URL] [NAME] [VIDEO] [WIDTH] [HEIGHT] [KEYWORD]...");
+            System.out.println("Wrong number of arguments:\n\t $ java streamer.Streamer [PORTAL_URL] [NAME] [VIDEO] [RESOLUTION] [KEYWORD]...");
             System.exit(0);
         }
 
@@ -47,16 +53,13 @@ public class Streamer {
         String video = args[2];
 
         // The width in pixels
-        int width = Integer.parseInt(args[3]);
-
-        // The height in pixels
-        int height = Integer.parseInt(args[4]);
+        String res = args[3];
 
         // Keywords defining the stream
-        String[] keywords = Arrays.copyOfRange(args, 5, args.length);
+        String[] keywords = Arrays.copyOfRange(args, 4, args.length);
 
         // Key generated that will allow a Streamer to perform actions on the Portal concerning his stream
-        String key = Md5.md5(new ByteArrayInputStream(new String(name + width + height + Arrays.toString(keywords) + System.currentTimeMillis()).getBytes()));
+        String key = Md5.md5(new ByteArrayInputStream(new String(name + res + Arrays.toString(keywords) + System.currentTimeMillis()).getBytes()));
 
         int status = 0;
 
@@ -133,14 +136,23 @@ public class Streamer {
             String VIDEO_CODEC_OPTION = "-c:v";
             String VIDEO_CODEC = "libx264";
 
-            String AUDIO_CODEC_OPTION = "-c:a";
-            String AUDIO_CODEC = "libfdk_aac";
-
             String VIDEO_BITRATE_OPTION = "-b:v";
-            String VIDEO_BITRATE = "";
+            String VIDEO_BITRATE = Resolutions.BITRATES.get(res);
+
+            String BUF_SIZE_OPTION = "-bufsize";
+            String BUF_SIZE = VIDEO_BITRATE;
+
+            String MIN_BITRATE_OPTION = "-minrate";
+            String MIN_BITRATE = VIDEO_BITRATE;
+
+            String MAX_BITRATE_OPTION = "-maxrate";
+            String MAX_BITRATE = VIDEO_BITRATE;
+
+            String AUDIO_CODEC_OPTION = "-c:a";
+            String AUDIO_CODEC = "libvo_aacenc";
 
             String AUDIO_BITRATE_OPTION = "-b:a";
-            String AUDIO_BITRATE = "";
+            String AUDIO_BITRATE = "64k";
 
             /*
              * Set pixel format. Use -pix_fmts to show all the supported pixel formats.
@@ -159,44 +171,60 @@ public class Streamer {
             String TUNE = "zerolatency";
 
             String PRESET_OPTION = "-preset";
-            String PRESET = "ultrafast";
+            String PRESET = "veryfast";
 
             String VIDEO_PROFILE_OPTION = "-profile:v";
-            String VIDEO_PROFILE = "high";
+            String VIDEO_PROFILE = "baseline";
+
 
             String METADATA_OPTION = "-metadata";
             String METADATA = "title=\"" + name + "\"";
 
             String SCALE_OPTION = "-s";
-            String SCALE = width + "x" + height;
+            String SCALE = Resolutions.RESOLUTIONS.get(res);
 
             String OUTPUT = "tcp://127.0.0.1:8080?listen=1";
 
-            ProcessBuilder pb = new ProcessBuilder("ffmpeg",
-                    READ_OPTION,
-                    INPUT_OPTION, INPUT,
-                    VIDEO_CODEC_OPTION, VIDEO_CODEC,
-                    PIXEL_FORMAT_OPTION, PIXEL_FORMAT,
-                    TUNE_OPTION, TUNE,
-                    PRESET_OPTION, PRESET,
-                    VIDEO_PROFILE_OPTION, VIDEO_PROFILE,
-                    METADATA_OPTION, METADATA,
-                    SCALE_OPTION, SCALE,
-                    FORMAT_OPTION, FORMAT,
-                    OUTPUT);
+            new Thread(() -> {
+                try {
+                    ProcessBuilder pb = new ProcessBuilder(
+                            "ffmpeg",
+                            READ_OPTION,
+                            INPUT_OPTION, INPUT,
+                            VIDEO_CODEC_OPTION, VIDEO_CODEC,
+                            PIXEL_FORMAT_OPTION, PIXEL_FORMAT,
+                            VIDEO_BITRATE_OPTION, VIDEO_BITRATE,
+                            MIN_BITRATE_OPTION, MIN_BITRATE,
+                            MAX_BITRATE_OPTION, MAX_BITRATE,
+                            BUF_SIZE_OPTION, BUF_SIZE,
+                            //AUDIO_CODEC_OPTION, AUDIO_CODEC,
+                            //AUDIO_BITRATE_OPTION, AUDIO_BITRATE,
+                            //TUNE_OPTION, TUNE,
+                            "-crf", "22",
+                            PRESET_OPTION, PRESET,
+                            VIDEO_PROFILE_OPTION, VIDEO_PROFILE,
+                            METADATA_OPTION, METADATA,
+                            SCALE_OPTION, SCALE,
+                            FORMAT_OPTION, FORMAT,
+                            OUTPUT);
 
 
-            System.out.println(String.join(" ", pb.command()));
-            Process proc = pb.start();
+                    System.out.println(String.join(" ", pb.command()));
+                    Process proc = pb.start();
 
-            /*
-            BufferedReader stderr = new BufferedReader(new
-                    InputStreamReader(proc.getErrorStream()));
 
-            String s = null;
-            while ((s = stderr.readLine()) != null)
-                System.out.println(s);
-            */
+                    BufferedReader stderr = new BufferedReader(new
+                            InputStreamReader(proc.getErrorStream()));
+
+                    String s = null;
+
+                    while ((s = stderr.readLine()) != null)
+                        System.out.println(s);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
 
 
             //Establish a connection to ffmpeg
@@ -232,16 +260,16 @@ public class Streamer {
             serverSocketChannel.configureBlocking(false);
 
             // The ID is generated by the Portal
-            String id = streamerInterface.addStream(key, name, "TCP", Inet4Address.getLocalHost().getHostAddress(), serverSocketChannel.socket().getLocalPort(), width, height, 400, keywords);
+            String id = streamerInterface.addStream(key, name, "TCP", InetAddress.getLocalHost().getHostAddress(), serverSocketChannel.socket().getLocalPort(), res, VIDEO_BITRATE, keywords);
 
-            if(!Validator.validateKey(id)) {
+            if (!Validator.validateKey(id)) {
                 System.exit(1);
             }
 
             System.out.println("ID = " + id);
             Runtime.getRuntime().addShutdownHook(new Thread(
                     () -> streamerInterface.deleteStream(id, key)));
-            
+
             Selector selector = Selector.open();
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT, null);
 
@@ -274,8 +302,6 @@ public class Streamer {
                 }
                 buffer.clear();
             }
-
-            streamerInterface.deleteStream(id, key);
 
         } catch (Ice.LocalException e) {
             e.printStackTrace();

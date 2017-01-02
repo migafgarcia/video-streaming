@@ -220,3 +220,7 @@ slice
 
 # Icestorm Freeze database
 db
+
+# Test videos
+videos/best_100_goals_2016.mp4
+videos/bunny_1080p_30fps.mp4

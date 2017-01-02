@@ -1,5 +1,7 @@
 package helper;
 
+import shared.Resolutions;
+
 /**
  *
  */
@@ -23,8 +25,8 @@ public class Validator {
         return ip.matches(IP_REGEX);
     }
 
-    public static boolean validateResolution(int width, int height) {
-        return width >= 200 && width <= 1920 && height >= 200 && height <= 1080;
+    public static boolean validateResolution(String res) {
+        return Resolutions.RESOLUTIONS.containsKey(res);
     }
 
 

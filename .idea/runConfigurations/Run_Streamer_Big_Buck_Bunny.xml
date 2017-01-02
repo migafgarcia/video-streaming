@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Streamer Popeye" type="Application" factoryName="Application">
+  <configuration default="false" name="Run Streamer Big Buck Bunny" type="Application" factoryName="Application">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <option name="MAIN_CLASS_NAME" value="streamer.Streamer" />
     <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="127.0.0.1 &quot;Popeye&quot; videos/popeye.mp4 240p popeye alibaba lowres nothd" />
+    <option name="PROGRAM_PARAMETERS" value="127.0.0.1 &quot;Big Buck Bunny&quot; videos/bunny_1080p_30fps.mp4 1080p highres 1080p 30fps bunny" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" />

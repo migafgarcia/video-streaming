@@ -67,8 +67,9 @@ public class Client {
             Scanner scanner = new Scanner(System.in);
             String line;
 
-
+            System.out.print("> ");
             while(scanner.hasNextLine()) {
+
                 line = scanner.nextLine();
 
                 Matcher connectMatcher = connectPattern.matcher(line);
@@ -89,13 +90,14 @@ public class Client {
                     else {
                         Process p = new ProcessBuilder("vlc", "tcp://" + stream.ip + ":" + stream.port).start();
                         p.waitFor();
+                        System.out.println("STREAM CLOSED");
                     }
                 }
                 else if(searchMatcher.matches()) {
 
                 }
 
-
+                System.out.print("> ");
             }
 
             ic.waitForShutdown();
