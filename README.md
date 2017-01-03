@@ -13,23 +13,23 @@ $ ./gradlew runIcestorm
 
 ### Portal
 
-```bash
+```
 $ java -cp ./build/libs/videostreaming.jar portal.Portal
 ```
 
 ### Client
 
-```bash
+```
 $ java -cp ./build/libs/videostreaming.jar client.Client [PORTAL_URL]
 ```
 Example:
 
-```bash
+```
 $ java -cp ./build/libs/videostreaming.jar client.Client 192.168.1.5
 ```
 
 ### Streamer
-```bash
+```
 $ java -cp ./build/libs/videostreaming.jar streamer.Streamer [PORTAL_URL] [NAME] [VIDEO] [RESOLUTION] [KEYWORD]...
 ```
 
@@ -45,6 +45,6 @@ Supported resolutions are the following:
 ```
 
 Example:
-```bash
+```
 $ java -cp ./build/libs/videostreaming.jar streamer.Streamer 127.0.0.1 "Top Gear" videos/topgear.mp4 360p test topgear bbc cars vehicles comedy cptslow
 ```
