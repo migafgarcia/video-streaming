@@ -12,7 +12,7 @@ public class Resolutions {
     static {
         BITRATES = new HashMap<>(7);
         BITRATES.put("240p", "640k");
-        BITRATES.put("360p", "96k");
+        BITRATES.put("360p", "960k");
         BITRATES.put("432p", "1150k");
         BITRATES.put("480p", "1280k");
         BITRATES.put("576p", "1920k");
