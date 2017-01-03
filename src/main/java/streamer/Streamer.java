@@ -6,25 +6,21 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import helper.Md5;
 import helper.Validator;
 import portal.StreamerInterfacePrx;
 import portal.StreamerInterfacePrxHelper;
-import helper.Md5;
 import shared.Resolutions;
 
 /**
@@ -32,7 +28,7 @@ import shared.Resolutions;
  */
 public class Streamer {
 
-    public static final int MAX_RETRY = 5;
+    private static final int MAX_RETRY = 5;
 
 
     public static void main(String[] args) {
@@ -59,7 +55,7 @@ public class Streamer {
         String[] keywords = Arrays.copyOfRange(args, 4, args.length);
 
         // Key generated that will allow a Streamer to perform actions on the Portal concerning his stream
-        String key = Md5.md5(new ByteArrayInputStream(new String(name + res + Arrays.toString(keywords) + System.currentTimeMillis()).getBytes()));
+        String key = Md5.md5(new ByteArrayInputStream((name + res + Arrays.toString(keywords) + System.currentTimeMillis()).getBytes()));
 
         int status = 0;
 
@@ -212,10 +208,11 @@ public class Streamer {
                     BufferedReader stderr = new BufferedReader(new
                             InputStreamReader(proc.getErrorStream()));
 
-                    String s = null;
+                    String s;
 
-                    while ((s = stderr.readLine()) != null)
+                    while ((s = stderr.readLine()) != null) {
                         System.out.println(s);
+                    }
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -242,6 +239,7 @@ public class Streamer {
                 }
             }
 
+            assert videoSource != null;
             if (!videoSource.isConnected()) {
                 System.out.println("Could not connect to ffmpeg");
                 System.exit(1);
@@ -299,16 +297,7 @@ public class Streamer {
                 buffer.clear();
             }
 
-        } catch (Ice.LocalException e) {
-            e.printStackTrace();
-            status = 1;
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            status = 1;
-        } catch (ClosedChannelException e) {
-            e.printStackTrace();
-            status = 1;
-        } catch (IOException e) {
+        } catch (Ice.LocalException | IOException e) {
             e.printStackTrace();
             status = 1;
         }

@@ -12,7 +12,7 @@ import helper.Validator;
 /**
  * Manages Streamers and Clients
  */
-public class Manager {
+class Manager {
 
     private HashMap<String,Stream> streams;
 
@@ -22,7 +22,7 @@ public class Manager {
 
     private ClientInterfaceI clientInterface;
 
-    public Manager(NotificationPrx notificationPrx) {
+    Manager(NotificationPrx notificationPrx) {
 
         this.streams = new HashMap<>();
 
@@ -36,15 +36,15 @@ public class Manager {
 
     }
 
-    public StreamerInterfaceI getStreamerInterface() {
+    StreamerInterfaceI getStreamerInterface() {
         return streamerInterface;
     }
 
-    public ClientInterfaceI getClientInterface() {
+    ClientInterfaceI getClientInterface() {
         return clientInterface;
     }
 
-    public StreamInfo[] getStreamInfos() {
+    private StreamInfo[] getStreamInfos() {
 
         AtomicInteger i = new AtomicInteger(0);
 
@@ -92,15 +92,14 @@ public class Manager {
                             ", keywords: " + Arrays.toString(keywords));
 
             // Generate id for new stream (expensive, but only run once)
-            String id = Md5.md5(new ByteArrayInputStream(new String(
-                    name +
-                            proto +
-                            hostname +
-                            port +
-                            res +
-                            bitrate +
-                            Arrays.toString(keywords) +
-                            System.currentTimeMillis()).getBytes()));
+            String id = Md5.md5(new ByteArrayInputStream((name +
+                    proto +
+                    hostname +
+                    port +
+                    res +
+                    bitrate +
+                    Arrays.toString(keywords) +
+                    System.currentTimeMillis()).getBytes()));
 
             System.out.println("ID = " + id);
 

@@ -49,11 +49,10 @@ public class Client {
             Ice.ObjectPrx proxy = adapter.addWithUUID(notification).ice_oneway();
             adapter.activate();
 
-            IceStorm.TopicPrx topic = null;
+            IceStorm.TopicPrx topic;
 
             topic = topicManager.retrieve("Stream");
-            java.util.Map qos = null;
-            topic.subscribeAndGetPublisher(qos, proxy);
+            topic.subscribeAndGetPublisher(null, proxy);
 
             final IceStorm.TopicPrx finalTopic = topic;
             Runtime.getRuntime().addShutdownHook(new Thread(
@@ -87,7 +86,7 @@ public class Client {
                 }
                 else if(connectMatcher1.matches() || connectMatcher2.matches()) {
 
-                    String streamName = null;
+                    String streamName;
 
                     if(connectMatcher1.matches())
                         streamName = connectMatcher1.group(1);
@@ -101,7 +100,7 @@ public class Client {
                     if(stream == null)
                         System.out.println("Stream doesn't exist");
                     else {
-                        Process p = new ProcessBuilder("vlc", "tcp://" + stream.hostname + ":" + stream.port).start();
+                        new ProcessBuilder("vlc", "tcp://" + stream.hostname + ":" + stream.port).start();
                     }
                 }
                 else if(searchMatcher.matches()) {
@@ -118,17 +117,7 @@ public class Client {
             ic.waitForShutdown();
 
             topic.unsubscribe(proxy);
-        } catch (Ice.LocalException e) {
-            e.printStackTrace();
-        } catch (InvalidSubscriber invalidSubscriber) {
-            invalidSubscriber.printStackTrace();
-        } catch (AlreadySubscribed alreadySubscribed) {
-            alreadySubscribed.printStackTrace();
-        } catch (NoSuchTopic noSuchTopic) {
-            noSuchTopic.printStackTrace();
-        } catch (BadQoS badQoS) {
-            badQoS.printStackTrace();
-        } catch (IOException e) {
+        } catch (Ice.LocalException | IOException | BadQoS | NoSuchTopic | AlreadySubscribed | InvalidSubscriber e) {
             e.printStackTrace();
         }
 
