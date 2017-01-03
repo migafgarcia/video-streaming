@@ -5,6 +5,8 @@
 $ ./gradlew compileSlice
 $ ./gradlew shadowJar
 ```
+Warning: This will download shadowJar, Ice and Icestorm
+
 ## To run
 
 ### Icestorm
