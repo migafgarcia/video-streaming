@@ -1,10 +1,11 @@
 # Video Streaming mini-service
 
-## To run
+## To compile
 ```
 $ ./gradlew compileSlice
 $ ./gradlew shadowJar
 ```
+## To run
 
 ### Icestorm
 ```
