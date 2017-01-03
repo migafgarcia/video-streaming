@@ -102,8 +102,6 @@ public class Client {
                         System.out.println("Stream doesn't exist");
                     else {
                         Process p = new ProcessBuilder("vlc", "tcp://" + stream.ip + ":" + stream.port).start();
-                        p.waitFor();
-                        System.out.println("STREAM CLOSED");
                     }
                 }
                 else if(searchMatcher.matches()) {
@@ -131,8 +129,6 @@ public class Client {
         } catch (BadQoS badQoS) {
             badQoS.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
