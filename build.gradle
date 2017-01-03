@@ -1,4 +1,22 @@
 apply plugin: 'java'
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
+    }
+}
+
+apply plugin: "com.github.johnrengelman.shadow"
+
+shadowJar {
+    baseName = 'videostreaming'
+    classifier = null
+    version = null
+}
 
 sourceSets {
     main {

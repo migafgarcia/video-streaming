@@ -1,9 +1,7 @@
 package client;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,10 +11,11 @@ import IceStorm.InvalidSubscriber;
 import IceStorm.NoSuchTopic;
 import portal.ClientInterfacePrx;
 import portal.ClientInterfacePrxHelper;
-import portal.Notification;
 import portal.StreamInfo;
 
 public class Client {
+
+    private static final String HELP = "Video Streaming Client\n\tl\t\t\t\t\tlist available streams\n\tc [name]\t\t\tconnect to stream with the given name. e.g.: c nicestream, c \"Very good stream\"\n\ts [keyword]\t\t\tsearch for streams with the given keyword. e.g.: s cars, c football\n";
     public static void main(String[] args) {
         /*
          *  Obtain a proxy for the TopicManager. This is the primary IceStorm object, used by both publishers and subscribers.
@@ -61,20 +60,24 @@ public class Client {
                     () -> finalTopic.unsubscribe(proxy)));
 
             Pattern listPattern = Pattern.compile("\\s*l\\s*");
-            Pattern connectPattern = Pattern.compile("\\s*c\\s+(\\w+)\\s*");
+            Pattern connectPattern1 = Pattern.compile("\\s*c\\s+(\\w+)\\s*");
+            Pattern connectPattern2 = Pattern.compile("\\s*c\\s+\"([\\w\\s]+)\"\\s*");
             Pattern searchPattern = Pattern.compile("\\s*s\\s+(\\w+)\\s*");
+
 
             Scanner scanner = new Scanner(System.in);
             String line;
 
+
+            System.out.println(HELP);
             System.out.print("> ");
             while(scanner.hasNextLine()) {
 
                 line = scanner.nextLine();
 
-                Matcher connectMatcher = connectPattern.matcher(line);
+                Matcher connectMatcher1 = connectPattern1.matcher(line);
+                Matcher connectMatcher2 = connectPattern2.matcher(line);
                 Matcher searchMatcher = searchPattern.matcher(line);
-
 
 
                 if(listPattern.matcher(line).matches()) {
@@ -82,9 +85,19 @@ public class Client {
                     notification.printStreams();
 
                 }
-                else if(connectMatcher.matches()) {
-                    System.out.println("CONNECTING TO " + connectMatcher.group(1));
-                    StreamInfo stream = notification.getStreamInfo(connectMatcher.group(1));
+                else if(connectMatcher1.matches() || connectMatcher2.matches()) {
+
+                    String streamName = null;
+
+                    if(connectMatcher1.matches())
+                        streamName = connectMatcher1.group(1);
+                    else
+                        streamName = connectMatcher2.group(1);
+
+
+
+                    System.out.println("CONNECTING TO " + streamName);
+                    StreamInfo stream = notification.getByName(streamName);
                     if(stream == null)
                         System.out.println("Stream doesn't exist");
                     else {
@@ -94,7 +107,11 @@ public class Client {
                     }
                 }
                 else if(searchMatcher.matches()) {
-
+                    System.out.println("SEARCH: " + searchMatcher.group(1));
+                    notification.search(searchMatcher.group(1));
+                }
+                else {
+                    System.out.println(HELP);
                 }
 
                 System.out.print("> ");
