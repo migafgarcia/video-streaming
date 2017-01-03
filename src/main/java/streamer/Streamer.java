@@ -35,7 +35,7 @@ public class Streamer {
 
         // Read arguments
         if (args.length < 5) {
-            System.out.println("Wrong number of arguments:\n\t $ java streamer.Streamer [PORTAL_URL] [NAME] [VIDEO] [RESOLUTION] [KEYWORD]...");
+            System.out.println("Wrong number of arguments:\n\t Provide arguments [PORTAL_URL] [NAME] [VIDEO] [RESOLUTION] [KEYWORD]...");
             System.exit(0);
         }
 

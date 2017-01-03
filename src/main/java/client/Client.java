@@ -16,7 +16,18 @@ import portal.StreamInfo;
 public class Client {
 
     private static final String HELP = "Video Streaming Client\n\tl\t\t\t\t\tlist available streams\n\tc [name]\t\t\tconnect to stream with the given name. e.g.: c nicestream, c \"Very good stream\"\n\ts [keyword]\t\t\tsearch for streams with the given keyword. e.g.: s cars, c football\n";
+
     public static void main(String[] args) {
+
+        // Read arguments
+        if (args.length < 1) {
+            System.out.println("Wrong number of arguments:\n\t Provide arguments [PORTAL_URL]");
+            System.exit(0);
+        }
+
+        String portalUrl = args[0];
+
+
         /*
          *  Obtain a proxy for the TopicManager. This is the primary IceStorm object, used by both publishers and subscribers.
          *  Create an object adapter to host our Notification servant.
@@ -32,7 +43,7 @@ public class Client {
             ic = Ice.Util.initialize(args);
 
 
-            Ice.ObjectPrx base = ic.stringToProxy("ClientInterface:default -p 10000");
+            Ice.ObjectPrx base = ic.stringToProxy("ClientInterface:tcp -h " + portalUrl + " -p 10000");
 
             ClientInterfacePrx clientInterface = ClientInterfacePrxHelper.checkedCast(base);
 
@@ -40,7 +51,7 @@ public class Client {
             if (clientInterface == null)
                 throw new Error("Invalid proxy");
 
-            Ice.ObjectPrx obj = ic.stringToProxy("Notification/TopicManager:tcp -p 9999");
+            Ice.ObjectPrx obj = ic.stringToProxy("Notification/TopicManager:tcp -h " + portalUrl + " -p 9999");
             IceStorm.TopicManagerPrx topicManager = IceStorm.TopicManagerPrxHelper.checkedCast(obj);
 
             Ice.ObjectAdapter adapter = ic.createObjectAdapterWithEndpoints("NotificationAdapter", "tcp");
