@@ -9,7 +9,7 @@ $ ./gradlew shadowJar
 
 ### Icestorm
 ```
-$ ./gradlew runIcestorm
+$ icebox --Ice.Config=config.icebox
 ```
 
 ### Portal
