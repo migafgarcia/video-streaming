@@ -3,7 +3,7 @@
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <option name="MAIN_CLASS_NAME" value="streamer.Streamer" />
     <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="127.0.0.1 &quot;Top Gear&quot; videos/topgear.mp4 360p topgear bbc cars vehicles comedy cptslow" />
+    <option name="PROGRAM_PARAMETERS" value="127.0.0.1 &quot;Top Gear&quot; videos/topgear.mp4 360p test topgear bbc cars vehicles comedy cptslow" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" />
