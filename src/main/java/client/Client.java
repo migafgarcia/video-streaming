@@ -101,7 +101,7 @@ public class Client {
                     if(stream == null)
                         System.out.println("Stream doesn't exist");
                     else {
-                        Process p = new ProcessBuilder("vlc", "tcp://" + stream.ip + ":" + stream.port).start();
+                        Process p = new ProcessBuilder("vlc", "tcp://" + stream.hostname + ":" + stream.port).start();
                     }
                 }
                 else if(searchMatcher.matches()) {

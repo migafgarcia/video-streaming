@@ -63,7 +63,7 @@ public class Manager {
     private class StreamerInterfaceI extends _StreamerInterfaceDisp {
 
         @Override
-        public String addStream(String key, String name, String proto, String ip, int port, String res, String bitrate, String[] keywords, Current __current) {
+        public String addStream(String key, String name, String proto, String hostname, int port, String res, String bitrate, String[] keywords, Current __current) {
 
             if(!Validator.validateKey(key)) {
                 System.out.println("ADD STREAM -> invalid key");
@@ -72,11 +72,6 @@ public class Manager {
 
             if(!Validator.validateProto(proto)) {
                 System.out.println("ADD STREAM -> invalid protocol");
-                return null;
-            }
-
-            if(!Validator.validateIp(ip)) {
-                System.out.println("ADD STREAM -> invalid IP");
                 return null;
             }
 
@@ -90,7 +85,7 @@ public class Manager {
                     "ADD STREAM -> " +
                             "name: \"" + name +
                             "\", proto: \"" + proto +
-                            "\", ip: \"" + ip +
+                            "\", hostname: \"" + hostname +
                             "\", port: " + port +
                             ", res: " + res +
                             ", bitrate: " + bitrate +
@@ -100,7 +95,7 @@ public class Manager {
             String id = Md5.md5(new ByteArrayInputStream(new String(
                     name +
                             proto +
-                            ip +
+                            hostname +
                             port +
                             res +
                             bitrate +
@@ -114,7 +109,7 @@ public class Manager {
                 return null;
             }
 
-            StreamInfo streamInfo = new StreamInfo(id, name, proto, ip, port, res, bitrate, keywords);
+            StreamInfo streamInfo = new StreamInfo(id, name, proto, hostname, port, res, bitrate, keywords);
 
             // Adds the stream to the list
             streams.put(id, new Stream(key, streamInfo));
