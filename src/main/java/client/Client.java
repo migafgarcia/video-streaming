@@ -3,6 +3,7 @@ package client;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -83,10 +84,14 @@ public class Client {
 
             ArrayList<StreamInfo> currentList = new ArrayList<>();
 
-            notification.getStreams().forEach(stream -> {
-                System.out.println(currentList.size()+1 + " " + stream.name + " " + Arrays.toString(stream.keywords));
-                currentList.add(stream);
-            });
+            Collection<StreamInfo> streams = notification.getStreams();
+            if(streams.size() == 0)
+                System.out.println("No streams available");
+            else
+                streams.forEach(stream -> {
+                    System.out.println(currentList.size()+1 + " " + stream.name + " " + Arrays.toString(stream.keywords));
+                    currentList.add(stream);
+                });
 
 
             System.out.println(HELP);
@@ -106,10 +111,14 @@ public class Client {
                 else if(listPattern.matcher(line).matches()) {
                     System.out.println("LISTING");
                     currentList.clear();
-                    notification.getStreams().forEach(stream -> {
-                        System.out.println(currentList.size()+1 + " " + stream.name + " " + Arrays.toString(stream.keywords));
-                        currentList.add(stream);
-                    });
+                    streams = notification.getStreams();
+                    if(streams.size() == 0)
+                        System.out.println("No streams available");
+                    else
+                        streams.forEach(stream -> {
+                            System.out.println(currentList.size()+1 + " " + stream.name + " " + Arrays.toString(stream.keywords));
+                            currentList.add(stream);
+                        });
                 }
                 else if(connectMatcher.matches()) {
 
