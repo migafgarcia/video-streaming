@@ -18,7 +18,7 @@ import portal.StreamInfo;
 
 public class Client {
 
-    private static final String HELP = "Video Streaming Client\n\tl\t\t\t\t\tlist available streams\n\tc [name]\t\t\tconnect to stream with the given name. e.g.: c nicestream, c \"Very good stream\"\n\ts [keyword]\t\t\tsearch for streams with the given keyword. e.g.: s cars, c football\n";
+    private static final String HELP = "Video Streaming Client\n\tl\t\t\t\t\tlist available streams\n\tc [number]\t\t\tconnect to stream with the given number on the previously listed list. e.g.: c 3\n\ts [keyword]\t\t\tsearch for streams with the given keyword. e.g.: s cars, c football\n\te\t\t\t\t\texit";
 
     public static void main(String[] args) {
 
@@ -73,6 +73,7 @@ public class Client {
                     () -> finalTopic.unsubscribe(proxy)));
 
             Pattern listPattern = Pattern.compile("\\s*l\\s*");
+            Pattern exitPattern = Pattern.compile("\\s*e\\s*");
             Pattern connectPattern = Pattern.compile("\\s*c\\s+(\\d+)\\s*");
             Pattern searchPattern = Pattern.compile("\\s*s\\s+(\\w+)\\s*");
 
@@ -98,7 +99,11 @@ public class Client {
                 Matcher searchMatcher = searchPattern.matcher(line);
 
 
-                if(listPattern.matcher(line).matches()) {
+                if(exitPattern.matcher(line).matches()) {
+                    System.out.println("EXIT");
+                    System.exit(0);
+                }
+                else if(listPattern.matcher(line).matches()) {
                     System.out.println("LISTING");
                     currentList.clear();
                     notification.getStreams().forEach(stream -> {
