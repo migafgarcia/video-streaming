@@ -83,7 +83,7 @@ public class Client {
             ArrayList<StreamInfo> currentList = new ArrayList<>();
 
             notification.getStreams().forEach(stream -> {
-                System.out.println(currentList.size() + " " + stream.name + " " + Arrays.toString(stream.keywords));
+                System.out.println(currentList.size()+1 + " " + stream.name + " " + Arrays.toString(stream.keywords));
                 currentList.add(stream);
             });
 
@@ -102,15 +102,15 @@ public class Client {
                     System.out.println("LISTING");
                     currentList.clear();
                     notification.getStreams().forEach(stream -> {
-                        System.out.println(currentList.size() + " " + stream.name + " " + Arrays.toString(stream.keywords));
+                        System.out.println(currentList.size()+1 + " " + stream.name + " " + Arrays.toString(stream.keywords));
                         currentList.add(stream);
                     });
                 }
                 else if(connectMatcher.matches()) {
 
-                    int i = new Integer(connectMatcher.group(1));
+                    int i = new Integer(connectMatcher.group(1)) - 1;
 
-                    if(i < currentList.size()) {
+                    if(i < currentList.size() && i >= 0) {
 
                         StreamInfo stream = currentList.get(i);
                         System.out.println("CONNECTING TO " + stream.name);
