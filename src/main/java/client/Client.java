@@ -1,6 +1,9 @@
 package client;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,13 +73,19 @@ public class Client {
                     () -> finalTopic.unsubscribe(proxy)));
 
             Pattern listPattern = Pattern.compile("\\s*l\\s*");
-            Pattern connectPattern1 = Pattern.compile("\\s*c\\s+(\\w+)\\s*");
-            Pattern connectPattern2 = Pattern.compile("\\s*c\\s+\"([\\w\\s]+)\"\\s*");
+            Pattern connectPattern = Pattern.compile("\\s*c\\s+(\\d+)\\s*");
             Pattern searchPattern = Pattern.compile("\\s*s\\s+(\\w+)\\s*");
 
 
             Scanner scanner = new Scanner(System.in);
             String line;
+
+            ArrayList<StreamInfo> currentList = new ArrayList<>();
+
+            notification.getStreams().forEach(stream -> {
+                System.out.println(currentList.size() + " " + stream.name + " " + Arrays.toString(stream.keywords));
+                currentList.add(stream);
+            });
 
 
             System.out.println(HELP);
@@ -85,33 +94,35 @@ public class Client {
 
                 line = scanner.nextLine();
 
-                Matcher connectMatcher1 = connectPattern1.matcher(line);
-                Matcher connectMatcher2 = connectPattern2.matcher(line);
+                Matcher connectMatcher = connectPattern.matcher(line);
                 Matcher searchMatcher = searchPattern.matcher(line);
 
 
                 if(listPattern.matcher(line).matches()) {
                     System.out.println("LISTING");
-                    notification.printStreams();
-
+                    currentList.clear();
+                    notification.getStreams().forEach(stream -> {
+                        System.out.println(currentList.size() + " " + stream.name + " " + Arrays.toString(stream.keywords));
+                        currentList.add(stream);
+                    });
                 }
-                else if(connectMatcher1.matches() || connectMatcher2.matches()) {
+                else if(connectMatcher.matches()) {
 
-                    String streamName;
+                    int i = new Integer(connectMatcher.group(1));
 
-                    if(connectMatcher1.matches())
-                        streamName = connectMatcher1.group(1);
-                    else
-                        streamName = connectMatcher2.group(1);
+                    if(i < currentList.size()) {
 
+                        StreamInfo stream = currentList.get(i);
+                        System.out.println("CONNECTING TO " + stream.name);
+                        if(stream == null)
+                            System.out.println("Stream doesn't exist");
+                        else {
+                            new ProcessBuilder("vlc", "tcp://" + stream.hostname + ":" + stream.port).start();
+                        }
 
-
-                    System.out.println("CONNECTING TO " + streamName);
-                    StreamInfo stream = notification.getByName(streamName);
-                    if(stream == null)
-                        System.out.println("Stream doesn't exist");
+                    }
                     else {
-                        new ProcessBuilder("vlc", "tcp://" + stream.hostname + ":" + stream.port).start();
+                        System.out.println("Can't connect to stream");
                     }
                 }
                 else if(searchMatcher.matches()) {

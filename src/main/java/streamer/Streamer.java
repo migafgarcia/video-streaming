@@ -3,6 +3,7 @@ package streamer;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
@@ -48,8 +49,18 @@ public class Streamer {
         // The video file
         String video = args[2];
 
+        if(!new File(video).exists()) {
+            System.out.println("Video doesn't exist");
+            System.exit(1);
+        }
+
         // The width in pixels
         String res = args[3];
+
+        if(!Validator.validateResolution(res)) {
+            System.out.println("Invalid resolution");
+            System.exit(1);
+        }
 
         // Keywords defining the stream
         String[] keywords = Arrays.copyOfRange(args, 4, args.length);
@@ -197,6 +208,7 @@ public class Streamer {
                             VIDEO_PROFILE_OPTION, VIDEO_PROFILE,
                             METADATA_OPTION, METADATA,
                             SCALE_OPTION, SCALE,
+                            "-crf", "22",
                             FORMAT_OPTION, FORMAT,
                             OUTPUT);
 

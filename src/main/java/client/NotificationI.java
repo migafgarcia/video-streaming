@@ -21,8 +21,6 @@ public class NotificationI extends _NotificationDisp {
     // Maps keywords to stream infos (for searching)
     private Map<String,HashSet<StreamInfo>> keywords;
 
-    // Maps names to stream infos (for finding stream by name)
-    private Map<String,StreamInfo> streamNames;
 
     public NotificationI(StreamInfo[] initialStreams) {
         super();
@@ -31,11 +29,8 @@ public class NotificationI extends _NotificationDisp {
 
         keywords = Collections.synchronizedMap(new HashMap<String,HashSet<StreamInfo>>(initialStreams.length));
 
-        streamNames = Collections.synchronizedMap(new HashMap<String,StreamInfo>(initialStreams.length));
-
         for(StreamInfo stream : initialStreams) {
             streams.put(stream.id, stream);
-            streamNames.put(stream.name, stream);
 
             for(String keyword : stream.keywords) {
                 HashSet<StreamInfo> streamsWithKeyword = keywords.get(keyword);
@@ -46,15 +41,11 @@ public class NotificationI extends _NotificationDisp {
 
             }
         }
-
-        printStreams();
-
     }
 
     @Override
     public void streamAdded(StreamInfo streamInfo, Current __current) {
         streams.put(streamInfo.id, streamInfo);
-        streamNames.put(streamInfo.name, streamInfo);
 
         for(String keyword : streamInfo.keywords) {
             HashSet<StreamInfo> streamsWithKeyword = keywords.get(keyword);
@@ -70,7 +61,6 @@ public class NotificationI extends _NotificationDisp {
     @Override
     public void streamDeleted(String id, Current __current) {
         StreamInfo stream = streams.remove(id);
-        streamNames.remove(stream.name);
         for(String keyword : stream.keywords) {
             HashSet<StreamInfo> streamsWithKeyword = keywords.get(keyword);
             streamsWithKeyword.remove(stream);
@@ -84,7 +74,6 @@ public class NotificationI extends _NotificationDisp {
     @Override
     public void deleteAll(Current __current) {
         streams.clear();
-        streamNames.clear();
         keywords.clear();
 
     }
@@ -93,13 +82,9 @@ public class NotificationI extends _NotificationDisp {
         return streams.values();
     }
 
-    public StreamInfo getByName(String name) {
-        return streamNames.get(name);
-    }
-
     public void search(String keyword) {
         if(keywords.containsKey(keyword) && keywords.get(keyword).size() > 0)
-            keywords.get(keyword).forEach(stream -> System.out.println(stream.toString()));
+            keywords.get(keyword).forEach(stream -> System.out.println(stream.name + " " + Arrays.toString(stream.keywords)));
         else
             System.out.println("No streams match keyword " + keyword);
     }
@@ -107,14 +92,4 @@ public class NotificationI extends _NotificationDisp {
     public StreamInfo getStreamInfo(String id) {
         return streams.get(id);
     }
-
-    public void printStreams() {
-        if(streams.size() > 0) {
-            System.out.println("Current streams:");
-            streams.values().forEach(stream -> System.out.println(stream.id + " " + stream.name + " " + Arrays.toString(stream.keywords)));
-        }
-        else
-            System.out.println("No streams available");
-    }
-
 }
