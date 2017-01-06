@@ -1,6 +1,6 @@
 IceStorm.InstanceName=Notification
 
-IceStorm.TopicManager.Endpoints=default -h localhost -p 9999
+IceStorm.TopicManager.Endpoints=default -p 9999
 
 Freeze.DbEnv.IceStorm.DbHome=db
 
