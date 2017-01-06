@@ -50,7 +50,7 @@ class Manager {
 
         StreamInfo[] streamInfos = new StreamInfo[streams.values().size()];
 
-        streams.values().forEach(stream ->  streamInfos[i.getAndIncrement()] = stream.streamInfo); // Java 8 sexy magic??
+        streams.values().forEach(stream ->  streamInfos[i.getAndIncrement()] = stream.streamInfo);
 
         return streamInfos;
 
