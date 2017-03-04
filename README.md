@@ -1,5 +1,12 @@
 # Video Streaming mini-service
 
+This is a simple TCP streaming service, using ZeroC Ice to provide communication between the components:
+- Portal, central management component, keeps track of which streams are active and provides updates on subscribed clients (using ZeroC Icestorm)
+- Streamer, transmits the stream to the connected clients
+- Client, subscribes to Portal to get information on available streams and can then connect to any of them
+
+This project was an assignment for the Distributed Systems course.
+
 ## To compile
 ```
 $ ./gradlew compileSlice
